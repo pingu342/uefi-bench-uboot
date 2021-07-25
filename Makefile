@@ -103,6 +103,7 @@ CC             := $(CROSS_COMPILE)gcc
 OBJCOPY        := $(CROSS_COMPILE)objcopy
 CFLAGS         += -fno-stack-protector -Wshadow -Wall -Wunused -Werror-implicit-function-declaration
 CFLAGS         += -I$(GNUEFI_DIR)/inc -I$(GNUEFI_DIR)/inc/$(GNUEFI_ARCH) -I$(GNUEFI_DIR)/inc/protocol
+CFLAGS         += -Iu-boot/include -Iu-boot/arch/arm/include
 CFLAGS         += -DCONFIG_$(GNUEFI_ARCH) -D__MAKEWITH_GNUEFI -DGNU_EFI_USE_MS_ABI
 LDFLAGS        += -L$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib -e $(EP_PREFIX)efi_main
 LDFLAGS        += -s -Wl,-Bsymbolic -nostdlib -shared
@@ -133,15 +134,15 @@ all: $(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a main.efi
 $(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a:
 	$(MAKE) -C$(GNUEFI_DIR) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(GNUEFI_ARCH) $(GNUEFI_LIBS)
 
-%.efi: %.o
+main.efi: main.o benchmark.o
 	@echo  [LD]  $(notdir $@)
 ifeq ($(CRT0_LIBS),)
 	@$(CC) $(LDFLAGS) $< -o $@ $(LIBS)
 else
-	@$(CC) $(LDFLAGS) $< -o $*.elf $(LIBS)
+	@$(CC) $(LDFLAGS) main.o benchmark.o u-boot/sha1.o u-boot/sha256.o u-boot/rsa-mod-exp.o -o main.elf $(LIBS)
 	@$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel* \
-	            -j .rela* -j .reloc -j .eh_frame -O binary $*.elf $@
-	@rm -f $*.elf
+	            -j .rela* -j .reloc -j .eh_frame -O binary main.elf $@
+#	@rm -f $*.elf
 endif
 
 %.o: %.c
@@ -165,6 +166,7 @@ $(FW_BASE)_$(FW_ARCH).fd:
 clean:
 	rm -f main.efi *.o
 	rm -rf image
+	rm -f main.elf
 
 superclean: clean
 	$(MAKE) -C$(GNUEFI_DIR) ARCH=$(GNUEFI_ARCH) clean

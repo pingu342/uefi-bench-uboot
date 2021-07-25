@@ -7,6 +7,8 @@
 #include <efilib.h>
 #include <libsmbios.h>
 
+extern void benchmark(void);
+
 #if defined(_M_X64) || defined(__x86_64__)
 static CHAR16* Arch = L"x64";
 static CHAR16* ArchName = L"64-bit x86";
@@ -115,6 +117,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
 	Print(L"\n%H*** UEFI Simple ***%N\n\n");
 
 	PrintSystemInfo();
+
+	benchmark();
 
 	Print(L"\n%EPress any key to exit.%N\n");
 	SystemTable->ConIn->Reset(SystemTable->ConIn, FALSE);
