@@ -33,6 +33,11 @@ uefi-simpleを流用してU-Bootに含まれるSHA,RSAのベンチマークをqe
     
     Press any key to exit.
 
+トラブルシューティング
+
+- `git submodule update`で`fatal: unable to connect to git.code.sf.net:`エラーが発生する場合は[https://wiki.osdev.org/GNU-EFI](https://wiki.osdev.org/GNU-EFI)の[GNU-EFI](https://sourceforge.net/projects/gnu-efi/files/)のリンクからソースコードをダウンロードして`uefi-bench-uboot/gnu-efi`に配置すればよい。
+
+
 UEFI:SIMPLE - EFI development made easy
 =======================================
 
